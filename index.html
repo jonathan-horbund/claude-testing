@@ -9,51 +9,57 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: #0f0f1a;
-            color: #e0e0e0;
+            background: #fffbf0;
+            color: #1a1a1a;
             min-height: 100vh;
         }
 
         .screen { display: none; min-height: 100vh; padding: 20px 16px 40px; }
         .screen.active { display: block; }
 
+        /* ── Header banner ── */
+        .app-header {
+            background: #f5c431; border-radius: 18px; padding: 20px 16px 16px;
+            text-align: center; margin-bottom: 24px;
+        }
+        .app-header h1 { font-size: 26px; font-weight: 800; color: #1a1a1a; margin-bottom: 4px; }
+        .app-header .subtitle { color: rgba(0,0,0,0.5); font-size: 13px; }
+
         /* ── Typography ── */
-        h1 { text-align: center; font-size: 26px; font-weight: 800; color: #fff; margin-bottom: 6px; }
-        .subtitle { text-align: center; color: #666; font-size: 14px; margin-bottom: 28px; }
         .section-label {
             font-size: 11px; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 1.2px; color: #555; margin-bottom: 10px;
+            letter-spacing: 1.2px; color: #999; margin-bottom: 10px;
         }
 
         /* ── Toggle groups ── */
         .toggle-group { display: flex; gap: 8px; margin-bottom: 22px; }
         .toggle-btn {
-            flex: 1; padding: 13px 8px; border: 2px solid #2a2a3e; border-radius: 12px;
-            background: #16213e; color: #666; font-size: 13px; font-weight: 600;
+            flex: 1; padding: 13px 8px; border: 2px solid #e8e0d0; border-radius: 12px;
+            background: #fff; color: #aaa; font-size: 13px; font-weight: 600;
             cursor: pointer; text-align: center; transition: all 0.2s;
         }
         .toggle-btn.selected {
-            border-color: #4ade80; color: #4ade80;
-            background: rgba(74,222,128,0.08);
+            border-color: #f5c431; color: #1a1a1a;
+            background: #fff9e0;
         }
         .toggle-btn .t-icon { font-size: 22px; margin-bottom: 4px; }
-        .toggle-btn .t-sub { font-size: 11px; color: #555; font-weight: 400; margin-top: 2px; }
-        .toggle-btn.selected .t-sub { color: rgba(74,222,128,0.6); }
+        .toggle-btn .t-sub { font-size: 11px; color: #bbb; font-weight: 400; margin-top: 2px; }
+        .toggle-btn.selected .t-sub { color: #999; }
 
         /* ── Player name inputs ── */
         .player-inputs { display: flex; flex-direction: column; gap: 10px; margin-bottom: 22px; }
         .player-row { display: flex; align-items: center; gap: 10px; }
         .p-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
         input[type="text"] {
-            flex: 1; padding: 13px 14px; background: #16213e; border: 2px solid #2a2a3e;
-            border-radius: 10px; color: #fff; font-size: 16px; outline: none;
+            flex: 1; padding: 13px 14px; background: #fff; border: 2px solid #e8e0d0;
+            border-radius: 10px; color: #1a1a1a; font-size: 16px; outline: none;
             transition: border-color 0.2s;
         }
-        input[type="text"]:focus { border-color: #4ade80; }
+        input[type="text"]:focus { border-color: #f5c431; }
 
         /* ── Buttons ── */
         .btn-primary {
-            width: 100%; padding: 17px; background: #4ade80; color: #0f0f1a;
+            width: 100%; padding: 17px; background: #f5c431; color: #1a1a1a;
             border: none; border-radius: 14px; font-size: 17px; font-weight: 800;
             cursor: pointer; transition: opacity 0.15s;
         }
@@ -61,101 +67,101 @@
 
         .btn { padding: 15px; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; transition: opacity 0.15s; border: none; }
         .btn:active { opacity: 0.8; }
-        .btn-green { background: #4ade80; color: #0f0f1a; }
-        .btn-ghost { background: #16213e; border: 2px solid #2a2a3e; color: #777; }
+        .btn-green { background: #f5c431; color: #1a1a1a; }
+        .btn-ghost { background: #fff; border: 2px solid #e8e0d0; color: #999; }
 
         /* ── Game screen ── */
         .game-header {
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;
+            display: flex; justify-content: space-between; align-items: center;
+            background: #f5c431; border-radius: 16px; padding: 14px 16px; margin-bottom: 6px;
         }
-        .game-title { font-size: 17px; font-weight: 800; color: #fff; }
+        .game-title { font-size: 17px; font-weight: 800; color: #1a1a1a; }
         .mode-badge {
-            padding: 4px 12px; background: rgba(74,222,128,0.12);
-            border: 1px solid rgba(74,222,128,0.25); border-radius: 20px;
-            font-size: 12px; color: #4ade80; font-weight: 600;
+            padding: 4px 12px; background: rgba(0,0,0,0.12);
+            border-radius: 20px; font-size: 12px; color: #1a1a1a; font-weight: 700;
         }
-        .target-line { text-align: center; color: #444; font-size: 12px; margin-bottom: 16px; }
+        .target-line { text-align: center; color: #bbb; font-size: 12px; margin-bottom: 16px; }
 
         .score-grid {
             display: grid; grid-template-columns: 1fr 1fr;
             gap: 10px; margin-bottom: 16px;
         }
         .score-card {
-            background: #16213e; border: 2px solid #1f2a44; border-radius: 16px;
-            padding: 16px 12px; text-align: center; transition: border-color 0.3s;
+            background: #fff; border: 3px solid #e8e0d0; border-radius: 16px;
+            padding: 16px 12px; text-align: center; transition: border-color 0.3s, box-shadow 0.3s;
         }
-        .score-card.leading { border-color: #4ade80; }
+        .score-card.leading { border-color: #f5c431; box-shadow: 0 2px 12px rgba(245,196,49,0.25); }
         .score-card.span-2 { grid-column: span 2; }
         .sc-name {
-            font-size: 12px; font-weight: 600; color: #888; margin-bottom: 4px;
+            font-size: 12px; font-weight: 700; color: #aaa; margin-bottom: 4px;
             display: flex; align-items: center; justify-content: center; gap: 6px;
         }
-        .sc-score { font-size: 52px; font-weight: 800; color: #fff; line-height: 1; }
-        .score-card.leading .sc-score { color: #4ade80; }
-        .sc-bar { height: 4px; background: #1f2a44; border-radius: 2px; overflow: hidden; margin-top: 8px; }
-        .sc-fill { height: 100%; background: #4ade80; border-radius: 2px; transition: width 0.5s ease; }
+        .sc-score { font-size: 52px; font-weight: 800; color: #1a1a1a; line-height: 1; }
+        .score-card.leading .sc-score { color: #c49a00; }
+        .sc-bar { height: 5px; background: #f0ebe0; border-radius: 3px; overflow: hidden; margin-top: 10px; }
+        .sc-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
 
         .action-row { display: flex; gap: 10px; margin-bottom: 16px; }
         .action-row .btn { flex: 1; }
 
         .history-section { margin-top: 4px; }
-        .history-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #444; margin-bottom: 8px; }
+        .history-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #ccc; margin-bottom: 8px; }
         .history-item {
-            background: #16213e; border-radius: 8px; padding: 9px 12px;
-            font-size: 13px; color: #888; display: flex; justify-content: space-between;
+            background: #fff; border: 1px solid #f0ebe0; border-radius: 8px; padding: 9px 12px;
+            font-size: 13px; color: #999; display: flex; justify-content: space-between;
             margin-bottom: 6px;
         }
-        .history-item .rnd { font-size: 11px; color: #444; }
-        .empty-history { text-align: center; color: #333; font-size: 13px; padding: 20px; }
+        .history-item .rnd { font-size: 11px; color: #ccc; }
+        .empty-history { text-align: center; color: #ddd; font-size: 13px; padding: 20px; }
 
         /* ── Modal ── */
         .modal-overlay {
             display: none; position: fixed; inset: 0;
-            background: rgba(0,0,0,0.75); z-index: 100; align-items: flex-end;
+            background: rgba(0,0,0,0.4); z-index: 100; align-items: flex-end;
         }
         .modal-overlay.open { display: flex; }
         .modal {
-            background: #0f0f1a; border-radius: 22px 22px 0 0;
+            background: #fffbf0; border-radius: 22px 22px 0 0;
             padding: 24px 20px 44px; width: 100%; max-height: 90vh; overflow-y: auto;
         }
-        .modal-title { font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 20px; text-align: center; }
+        .modal-title { font-size: 20px; font-weight: 800; color: #1a1a1a; margin-bottom: 20px; text-align: center; }
 
         /* Classic modal */
         .winner-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
         .winner-item {
-            padding: 13px 14px; background: #16213e; border: 2px solid #2a2a3e;
-            border-radius: 10px; color: #bbb; font-size: 15px; font-weight: 600;
+            padding: 13px 14px; background: #fff; border: 2px solid #e8e0d0;
+            border-radius: 10px; color: #555; font-size: 15px; font-weight: 600;
             cursor: pointer; text-align: left; display: flex; align-items: center;
             gap: 10px; transition: all 0.2s;
         }
-        .winner-item.selected { border-color: #4ade80; color: #4ade80; background: rgba(74,222,128,0.08); }
+        .winner-item.selected { border-color: #f5c431; color: #1a1a1a; background: #fff9e0; }
 
         .pip-section { margin-bottom: 18px; }
         .pip-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-        .pip-name { flex: 1; font-size: 14px; color: #aaa; }
+        .pip-name { flex: 1; font-size: 14px; color: #777; }
         input[type="number"] {
-            width: 82px; padding: 10px 10px; background: #16213e; border: 2px solid #2a2a3e;
-            border-radius: 8px; color: #fff; font-size: 17px; text-align: center; outline: none;
+            width: 82px; padding: 10px 10px; background: #fff; border: 2px solid #e8e0d0;
+            border-radius: 8px; color: #1a1a1a; font-size: 17px; text-align: center; outline: none;
         }
-        input[type="number"]:focus { border-color: #4ade80; }
+        input[type="number"]:focus { border-color: #f5c431; }
         .modal-btns { display: flex; gap: 10px; }
         .modal-btns .btn { flex: 1; }
 
         /* Fives modal */
         .player-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
         .chip {
-            padding: 10px 16px; background: #16213e; border: 2px solid #2a2a3e;
-            border-radius: 10px; color: #888; font-size: 14px; font-weight: 600;
+            padding: 10px 16px; background: #fff; border: 2px solid #e8e0d0;
+            border-radius: 10px; color: #aaa; font-size: 14px; font-weight: 600;
             cursor: pointer; transition: all 0.2s;
         }
-        .chip.selected { border-color: #4ade80; color: #4ade80; background: rgba(74,222,128,0.08); }
+        .chip.selected { border-color: #f5c431; color: #1a1a1a; background: #fff9e0; }
 
         .score-quick { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 14px; }
         .score-quick .btn {
-            padding: 14px 4px; background: #16213e; border: 2px solid #2a2a3e;
-            color: #ccc; font-size: 15px; font-weight: 700; border-radius: 10px; flex: none;
+            padding: 14px 4px; background: #fff; border: 2px solid #e8e0d0;
+            color: #555; font-size: 15px; font-weight: 700; border-radius: 10px; flex: none;
         }
-        .score-quick .btn:active { border-color: #4ade80; color: #4ade80; background: rgba(74,222,128,0.1); }
+        .score-quick .btn:active { border-color: #f5c431; background: #fff9e0; color: #1a1a1a; }
 
         .custom-row { display: flex; gap: 10px; align-items: center; margin-bottom: 18px; }
         .custom-row input { flex: 1; }
@@ -167,44 +173,54 @@
             justify-content: center; min-height: 100vh; padding: 40px 20px; text-align: center;
         }
         .trophy-icon { font-size: 80px; margin-bottom: 16px; }
-        .winner-name { font-size: 38px; font-weight: 800; color: #4ade80; margin-bottom: 6px; }
-        .winner-sub { font-size: 17px; color: #666; margin-bottom: 36px; }
+        .winner-name { font-size: 38px; font-weight: 800; color: #c49a00; margin-bottom: 6px; }
+        .winner-sub { font-size: 17px; color: #aaa; margin-bottom: 36px; }
         .final-card {
-            width: 100%; max-width: 340px; background: #16213e;
-            border-radius: 16px; padding: 18px 20px; margin-bottom: 36px;
+            width: 100%; max-width: 340px; background: #fff;
+            border: 2px solid #e8e0d0; border-radius: 16px; padding: 18px 20px; margin-bottom: 36px;
         }
         .final-row {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 9px 0; border-bottom: 1px solid #1f2a44;
+            padding: 9px 0; border-bottom: 1px solid #f0ebe0;
         }
         .final-row:last-child { border-bottom: none; }
-        .final-row.top .fr-name { color: #4ade80; }
-        .final-row.top .fr-pts { color: #4ade80; font-weight: 800; }
-        .fr-name { font-size: 15px; color: #ccc; }
-        .fr-pts { font-size: 15px; font-weight: 700; color: #888; }
+        .final-row.top .fr-name { color: #c49a00; font-weight: 700; }
+        .final-row.top .fr-pts { color: #c49a00; font-weight: 800; }
+        .fr-name { font-size: 15px; color: #555; }
+        .fr-pts { font-size: 15px; font-weight: 700; color: #aaa; }
         .winner-btns { display: flex; gap: 12px; width: 100%; max-width: 340px; }
         .winner-btns .btn { flex: 1; }
 
         /* Toast */
         #toast {
             position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
-            background: #333; color: #fff; padding: 10px 20px; border-radius: 20px;
+            background: #1a1a1a; color: #fff; padding: 10px 20px; border-radius: 20px;
             font-size: 13px; z-index: 300; display: none; white-space: nowrap;
         }
 
-        /* Colors */
-        .c0 { background: #60a5fa; } .c1 { background: #f472b6; }
-        .c2 { background: #fb923c; } .c3 { background: #a78bfa; }
-        .tc0 { color: #60a5fa; } .tc1 { color: #f472b6; }
-        .tc2 { color: #fb923c; } .tc3 { color: #a78bfa; }
+        /* Player colors — match the tile palette from the box */
+        .c0 { background: #7c5cbf; } /* purple */
+        .c1 { background: #e8604a; } /* salmon/red */
+        .c2 { background: #f0a030; } /* orange */
+        .c3 { background: #4a90d4; } /* blue  */
+        .tc0 { color: #7c5cbf; } .tc1 { color: #e8604a; }
+        .tc2 { color: #f0a030; } .tc3 { color: #4a90d4; }
+
+        /* Per-player progress fill colors */
+        .fill-0 { background: #7c5cbf; }
+        .fill-1 { background: #e8604a; }
+        .fill-2 { background: #f0a030; }
+        .fill-3 { background: #4a90d4; }
     </style>
 </head>
 <body>
 
 <!-- ══ SETUP ══ -->
 <div id="screen-setup" class="screen active">
-    <h1>🁣 Domino Tracker</h1>
-    <p class="subtitle">Up to 4 players · Classic &amp; Fives</p>
+    <div class="app-header">
+        <h1>🁣 Domino Tracker</h1>
+        <p class="subtitle">Up to 4 players · Classic &amp; Fives</p>
+    </div>
 
     <p class="section-label">Game Mode</p>
     <div class="toggle-group">
@@ -312,7 +328,7 @@
 <div id="toast"></div>
 
 <script>
-const COLORS = ['#60a5fa','#f472b6','#fb923c','#a78bfa'];
+const COLORS = ['#7c5cbf','#e8604a','#f0a030','#4a90d4'];
 const DEFAULTS = ['Player 1','Player 2','Player 3','Player 4'];
 const CLASSIC_TARGETS = [100, 150, 200];
 const FIVES_TARGETS = [61, 101, 150];
@@ -410,7 +426,7 @@ function renderScores() {
         card.innerHTML = `
             <div class="sc-name"><span class="p-dot c${i}" style="width:8px;height:8px"></span>${esc(p.name)}</div>
             <div class="sc-score">${p.score}</div>
-            <div class="sc-bar"><div class="sc-fill" style="width:${pct}%"></div></div>`;
+            <div class="sc-bar"><div class="sc-fill fill-${i}" style="width:${pct}%"></div></div>`;
         grid.appendChild(card);
     });
 }
