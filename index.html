@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Domino Score Tracker</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0f0f1a;
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+
+        .screen { display: none; min-height: 100vh; padding: 20px 16px 40px; }
+        .screen.active { display: block; }
+
+        /* ── Typography ── */
+        h1 { text-align: center; font-size: 26px; font-weight: 800; color: #fff; margin-bottom: 6px; }
+        .subtitle { text-align: center; color: #666; font-size: 14px; margin-bottom: 28px; }
+        .section-label {
+            font-size: 11px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 1.2px; color: #555; margin-bottom: 10px;
+        }
+
+        /* ── Toggle groups ── */
+        .toggle-group { display: flex; gap: 8px; margin-bottom: 22px; }
+        .toggle-btn {
+            flex: 1; padding: 13px 8px; border: 2px solid #2a2a3e; border-radius: 12px;
+            background: #16213e; color: #666; font-size: 13px; font-weight: 600;
+            cursor: pointer; text-align: center; transition: all 0.2s;
+        }
+        .toggle-btn.selected {
+            border-color: #4ade80; color: #4ade80;
+            background: rgba(74,222,128,0.08);
+        }
+        .toggle-btn .t-icon { font-size: 22px; margin-bottom: 4px; }
+        .toggle-btn .t-sub { font-size: 11px; color: #555; font-weight: 400; margin-top: 2px; }
+        .toggle-btn.selected .t-sub { color: rgba(74,222,128,0.6); }
+
+        /* ── Player name inputs ── */
+        .player-inputs { display: flex; flex-direction: column; gap: 10px; margin-bottom: 22px; }
+        .player-row { display: flex; align-items: center; gap: 10px; }
+        .p-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+        input[type="text"] {
+            flex: 1; padding: 13px 14px; background: #16213e; border: 2px solid #2a2a3e;
+            border-radius: 10px; color: #fff; font-size: 16px; outline: none;
+            transition: border-color 0.2s;
+        }
+        input[type="text"]:focus { border-color: #4ade80; }
+
+        /* ── Buttons ── */
+        .btn-primary {
+            width: 100%; padding: 17px; background: #4ade80; color: #0f0f1a;
+            border: none; border-radius: 14px; font-size: 17px; font-weight: 800;
+            cursor: pointer; transition: opacity 0.15s;
+        }
+        .btn-primary:active { opacity: 0.82; }
+
+        .btn { padding: 15px; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; transition: opacity 0.15s; border: none; }
+        .btn:active { opacity: 0.8; }
+        .btn-green { background: #4ade80; color: #0f0f1a; }
+        .btn-ghost { background: #16213e; border: 2px solid #2a2a3e; color: #777; }
+
+        /* ── Game screen ── */
+        .game-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;
+        }
+        .game-title { font-size: 17px; font-weight: 800; color: #fff; }
+        .mode-badge {
+            padding: 4px 12px; background: rgba(74,222,128,0.12);
+            border: 1px solid rgba(74,222,128,0.25); border-radius: 20px;
+            font-size: 12px; color: #4ade80; font-weight: 600;
+        }
+        .target-line { text-align: center; color: #444; font-size: 12px; margin-bottom: 16px; }
+
+        .score-grid {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 10px; margin-bottom: 16px;
+        }
+        .score-card {
+            background: #16213e; border: 2px solid #1f2a44; border-radius: 16px;
+            padding: 16px 12px; text-align: center; transition: border-color 0.3s;
+        }
+        .score-card.leading { border-color: #4ade80; }
+        .score-card.span-2 { grid-column: span 2; }
+        .sc-name {
+            font-size: 12px; font-weight: 600; color: #888; margin-bottom: 4px;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+        }
+        .sc-score { font-size: 52px; font-weight: 800; color: #fff; line-height: 1; }
+        .score-card.leading .sc-score { color: #4ade80; }
+        .sc-bar { height: 4px; background: #1f2a44; border-radius: 2px; overflow: hidden; margin-top: 8px; }
+        .sc-fill { height: 100%; background: #4ade80; border-radius: 2px; transition: width 0.5s ease; }
+
+        .action-row { display: flex; gap: 10px; margin-bottom: 16px; }
+        .action-row .btn { flex: 1; }
+
+        .history-section { margin-top: 4px; }
+        .history-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #444; margin-bottom: 8px; }
+        .history-item {
+            background: #16213e; border-radius: 8px; padding: 9px 12px;
+            font-size: 13px; color: #888; display: flex; justify-content: space-between;
+            margin-bottom: 6px;
+        }
+        .history-item .rnd { font-size: 11px; color: #444; }
+        .empty-history { text-align: center; color: #333; font-size: 13px; padding: 20px; }
+
+        /* ── Modal ── */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.75); z-index: 100; align-items: flex-end;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal {
+            background: #0f0f1a; border-radius: 22px 22px 0 0;
+            padding: 24px 20px 44px; width: 100%; max-height: 90vh; overflow-y: auto;
+        }
+        .modal-title { font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 20px; text-align: center; }
+
+        /* Classic modal */
+        .winner-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
+        .winner-item {
+            padding: 13px 14px; background: #16213e; border: 2px solid #2a2a3e;
+            border-radius: 10px; color: #bbb; font-size: 15px; font-weight: 600;
+            cursor: pointer; text-align: left; display: flex; align-items: center;
+            gap: 10px; transition: all 0.2s;
+        }
+        .winner-item.selected { border-color: #4ade80; color: #4ade80; background: rgba(74,222,128,0.08); }
+
+        .pip-section { margin-bottom: 18px; }
+        .pip-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .pip-name { flex: 1; font-size: 14px; color: #aaa; }
+        input[type="number"] {
+            width: 82px; padding: 10px 10px; background: #16213e; border: 2px solid #2a2a3e;
+            border-radius: 8px; color: #fff; font-size: 17px; text-align: center; outline: none;
+        }
+        input[type="number"]:focus { border-color: #4ade80; }
+        .modal-btns { display: flex; gap: 10px; }
+        .modal-btns .btn { flex: 1; }
+
+        /* Fives modal */
+        .player-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+        .chip {
+            padding: 10px 16px; background: #16213e; border: 2px solid #2a2a3e;
+            border-radius: 10px; color: #888; font-size: 14px; font-weight: 600;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .chip.selected { border-color: #4ade80; color: #4ade80; background: rgba(74,222,128,0.08); }
+
+        .score-quick { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 14px; }
+        .score-quick .btn {
+            padding: 14px 4px; background: #16213e; border: 2px solid #2a2a3e;
+            color: #ccc; font-size: 15px; font-weight: 700; border-radius: 10px; flex: none;
+        }
+        .score-quick .btn:active { border-color: #4ade80; color: #4ade80; background: rgba(74,222,128,0.1); }
+
+        .custom-row { display: flex; gap: 10px; align-items: center; margin-bottom: 18px; }
+        .custom-row input { flex: 1; }
+        .custom-row .btn { flex: none; padding: 12px 20px; }
+
+        /* Winner screen */
+        #screen-winner .screen-inner {
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; min-height: 100vh; padding: 40px 20px; text-align: center;
+        }
+        .trophy-icon { font-size: 80px; margin-bottom: 16px; }
+        .winner-name { font-size: 38px; font-weight: 800; color: #4ade80; margin-bottom: 6px; }
+        .winner-sub { font-size: 17px; color: #666; margin-bottom: 36px; }
+        .final-card {
+            width: 100%; max-width: 340px; background: #16213e;
+            border-radius: 16px; padding: 18px 20px; margin-bottom: 36px;
+        }
+        .final-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 9px 0; border-bottom: 1px solid #1f2a44;
+        }
+        .final-row:last-child { border-bottom: none; }
+        .final-row.top .fr-name { color: #4ade80; }
+        .final-row.top .fr-pts { color: #4ade80; font-weight: 800; }
+        .fr-name { font-size: 15px; color: #ccc; }
+        .fr-pts { font-size: 15px; font-weight: 700; color: #888; }
+        .winner-btns { display: flex; gap: 12px; width: 100%; max-width: 340px; }
+        .winner-btns .btn { flex: 1; }
+
+        /* Toast */
+        #toast {
+            position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
+            background: #333; color: #fff; padding: 10px 20px; border-radius: 20px;
+            font-size: 13px; z-index: 300; display: none; white-space: nowrap;
+        }
+
+        /* Colors */
+        .c0 { background: #60a5fa; } .c1 { background: #f472b6; }
+        .c2 { background: #fb923c; } .c3 { background: #a78bfa; }
+        .tc0 { color: #60a5fa; } .tc1 { color: #f472b6; }
+        .tc2 { color: #fb923c; } .tc3 { color: #a78bfa; }
+    </style>
+</head>
+<body>
+
+<!-- ══ SETUP ══ -->
+<div id="screen-setup" class="screen active">
+    <h1>🁣 Domino Tracker</h1>
+    <p class="subtitle">Up to 4 players · Classic &amp; Fives</p>
+
+    <p class="section-label">Game Mode</p>
+    <div class="toggle-group">
+        <button class="toggle-btn selected" id="mode-classic" onclick="selectMode('classic')">
+            <div class="t-icon">🎯</div>
+            <div>Classic</div>
+            <div class="t-sub">Count pip totals each round</div>
+        </button>
+        <button class="toggle-btn" id="mode-fives" onclick="selectMode('fives')">
+            <div class="t-icon">✋</div>
+            <div>Fives</div>
+            <div class="t-sub">Score multiples of 5</div>
+        </button>
+    </div>
+
+    <p class="section-label">Players</p>
+    <div class="toggle-group">
+        <button class="toggle-btn" id="cnt-2" onclick="setCount(2)">2</button>
+        <button class="toggle-btn selected" id="cnt-3" onclick="setCount(3)">3</button>
+        <button class="toggle-btn" id="cnt-4" onclick="setCount(4)">4</button>
+    </div>
+
+    <p class="section-label">Player Names</p>
+    <div class="player-inputs" id="player-inputs"></div>
+
+    <p class="section-label">Win at (points)</p>
+    <div class="toggle-group" id="target-group"></div>
+
+    <button class="btn-primary" onclick="startGame()">Start Game</button>
+</div>
+
+<!-- ══ GAME ══ -->
+<div id="screen-game" class="screen">
+    <div class="game-header">
+        <div class="game-title">Domino Tracker</div>
+        <div class="mode-badge" id="mode-badge"></div>
+    </div>
+    <div class="target-line" id="target-line"></div>
+    <div class="score-grid" id="score-grid"></div>
+    <div class="action-row">
+        <button class="btn btn-green" onclick="openScoreModal()">+ Add Score</button>
+        <button class="btn btn-ghost" onclick="undoLast()">↩ Undo</button>
+        <button class="btn btn-ghost" style="flex:none;padding:15px 16px" onclick="confirmNewSetup()" title="New Setup">⚙️</button>
+    </div>
+    <div class="history-section">
+        <div class="history-title">Round History</div>
+        <div id="history-list"></div>
+    </div>
+</div>
+
+<!-- ══ WINNER ══ -->
+<div id="screen-winner" class="screen">
+    <div class="screen-inner">
+        <div class="trophy-icon">🏆</div>
+        <div class="winner-name" id="winner-name"></div>
+        <div class="winner-sub">wins the game!</div>
+        <div class="final-card" id="final-scores"></div>
+        <div class="winner-btns">
+            <button class="btn btn-ghost" onclick="goSetup()">New Setup</button>
+            <button class="btn btn-green" onclick="playAgain()">Play Again</button>
+        </div>
+    </div>
+</div>
+
+<!-- ══ CLASSIC MODAL ══ -->
+<div class="modal-overlay" id="modal-classic" onclick="overlayClose(event,'modal-classic')">
+    <div class="modal">
+        <div class="modal-title">Record Round</div>
+        <p class="section-label">Who won the round?</p>
+        <div class="winner-list" id="classic-winners"></div>
+        <div class="pip-section" id="pip-section" style="display:none">
+            <p class="section-label" id="pip-label">Pips remaining in other hands</p>
+            <div id="pip-inputs"></div>
+        </div>
+        <div class="modal-btns">
+            <button class="btn btn-ghost" onclick="closeModal('modal-classic')">Cancel</button>
+            <button class="btn btn-green" style="flex:2" onclick="submitClassic()">Record Round</button>
+        </div>
+    </div>
+</div>
+
+<!-- ══ FIVES MODAL ══ -->
+<div class="modal-overlay" id="modal-fives" onclick="overlayClose(event,'modal-fives')">
+    <div class="modal">
+        <div class="modal-title">Add Points</div>
+        <p class="section-label">Player</p>
+        <div class="player-chips" id="fives-chips"></div>
+        <p class="section-label">Quick Score</p>
+        <div class="score-quick">
+            <button class="btn" onclick="fivesAdd(5)">5</button>
+            <button class="btn" onclick="fivesAdd(10)">10</button>
+            <button class="btn" onclick="fivesAdd(15)">15</button>
+            <button class="btn" onclick="fivesAdd(20)">20</button>
+            <button class="btn" onclick="fivesAdd(25)">25</button>
+        </div>
+        <p class="section-label">Custom</p>
+        <div class="custom-row">
+            <input type="number" id="fives-custom" min="0" step="1" placeholder="0">
+            <button class="btn btn-green" onclick="fivesAddCustom()">Add</button>
+        </div>
+        <button class="btn btn-ghost" style="width:100%" onclick="closeModal('modal-fives')">Done</button>
+    </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const COLORS = ['#60a5fa','#f472b6','#fb923c','#a78bfa'];
+const DEFAULTS = ['Player 1','Player 2','Player 3','Player 4'];
+const CLASSIC_TARGETS = [100, 150, 200];
+const FIVES_TARGETS = [61, 101, 150];
+
+let G = {
+    mode: 'classic',
+    count: 3,
+    target: 100,
+    players: [],   // {name, score}
+    history: [],   // {round, desc, snapshot}
+    round: 0
+};
+
+// ── Setup ──────────────────────────────────────────────
+
+function selectMode(m) {
+    G.mode = m;
+    ['classic','fives'].forEach(x =>
+        document.getElementById('mode-'+x).classList.toggle('selected', x === m)
+    );
+    renderTargets();
+}
+
+function setCount(n) {
+    G.count = n;
+    [2,3,4].forEach(i =>
+        document.getElementById('cnt-'+i).classList.toggle('selected', i === n)
+    );
+    renderNameInputs();
+}
+
+function renderNameInputs() {
+    const c = document.getElementById('player-inputs');
+    c.innerHTML = '';
+    for (let i = 0; i < G.count; i++) {
+        const row = document.createElement('div');
+        row.className = 'player-row';
+        const cur = document.getElementById('pname-'+i);
+        const val = cur ? cur.value : DEFAULTS[i];
+        row.innerHTML = `<div class="p-dot c${i}"></div>
+            <input type="text" id="pname-${i}" value="${esc(val)}" placeholder="${esc(DEFAULTS[i])}">`;
+        c.appendChild(row);
+    }
+}
+
+function renderTargets() {
+    const targets = G.mode === 'fives' ? FIVES_TARGETS : CLASSIC_TARGETS;
+    G.target = targets[0];
+    const c = document.getElementById('target-group');
+    c.innerHTML = '';
+    targets.forEach((t, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'toggle-btn' + (i === 0 ? ' selected' : '');
+        btn.textContent = t;
+        btn.onclick = () => {
+            G.target = t;
+            c.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+        };
+        c.appendChild(btn);
+    });
+}
+
+function startGame() {
+    G.players = Array.from({length: G.count}, (_, i) => {
+        const inp = document.getElementById('pname-'+i);
+        return { name: (inp && inp.value.trim()) || DEFAULTS[i], score: 0 };
+    });
+    G.history = [];
+    G.round = 0;
+    renderGameScreen();
+    show('game');
+}
+
+// ── Game screen ────────────────────────────────────────
+
+function renderGameScreen() {
+    document.getElementById('mode-badge').textContent = G.mode === 'classic' ? 'Classic' : 'Fives';
+    document.getElementById('target-line').textContent = `First to ${G.target} points wins`;
+    renderScores();
+    renderHistoryList();
+}
+
+function renderScores() {
+    const grid = document.getElementById('score-grid');
+    grid.innerHTML = '';
+    const maxScore = Math.max(0, ...G.players.map(p => p.score));
+
+    G.players.forEach((p, i) => {
+        const leading = p.score > 0 && p.score === maxScore;
+        const span = G.count === 3 && i === 2;
+        const pct = Math.min(100, G.target > 0 ? (p.score / G.target * 100) : 0);
+        const card = document.createElement('div');
+        card.className = 'score-card' + (leading ? ' leading' : '') + (span ? ' span-2' : '');
+        card.innerHTML = `
+            <div class="sc-name"><span class="p-dot c${i}" style="width:8px;height:8px"></span>${esc(p.name)}</div>
+            <div class="sc-score">${p.score}</div>
+            <div class="sc-bar"><div class="sc-fill" style="width:${pct}%"></div></div>`;
+        grid.appendChild(card);
+    });
+}
+
+function renderHistoryList() {
+    const list = document.getElementById('history-list');
+    if (!G.history.length) {
+        list.innerHTML = '<div class="empty-history">No rounds yet</div>';
+        return;
+    }
+    list.innerHTML = '';
+    [...G.history].reverse().slice(0, 12).forEach(h => {
+        const el = document.createElement('div');
+        el.className = 'history-item';
+        el.innerHTML = `<span>${esc(h.desc)}</span><span class="rnd">Round ${h.round}</span>`;
+        list.appendChild(el);
+    });
+}
+
+// ── Classic modal ──────────────────────────────────────
+
+let classicWinner = null;
+
+function openClassicModal() {
+    classicWinner = null;
+    document.getElementById('pip-section').style.display = 'none';
+
+    const wl = document.getElementById('classic-winners');
+    wl.innerHTML = '';
+
+    G.players.forEach((p, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'winner-item';
+        btn.innerHTML = `<span class="p-dot c${i}" style="width:9px;height:9px;border-radius:50%;background:${COLORS[i]}"></span>${esc(p.name)}`;
+        btn.onclick = () => {
+            classicWinner = i;
+            wl.querySelectorAll('.winner-item').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            renderPipInputs(i, false);
+            document.getElementById('pip-section').style.display = 'block';
+        };
+        wl.appendChild(btn);
+    });
+
+    // Blocked round option
+    const blk = document.createElement('button');
+    blk.className = 'winner-item';
+    blk.innerHTML = `<span style="font-size:18px">🔒</span> Blocked round`;
+    blk.onclick = () => {
+        classicWinner = 'block';
+        wl.querySelectorAll('.winner-item').forEach(b => b.classList.remove('selected'));
+        blk.classList.add('selected');
+        renderPipInputs(null, true);
+        document.getElementById('pip-section').style.display = 'block';
+    };
+    wl.appendChild(blk);
+
+    openModal('modal-classic');
+}
+
+function renderPipInputs(winnerIdx, all) {
+    document.getElementById('pip-label').textContent = all
+        ? 'Pips remaining per player (lowest wins)'
+        : 'Pips remaining in other hands';
+    const c = document.getElementById('pip-inputs');
+    c.innerHTML = '';
+    G.players.forEach((p, i) => {
+        if (!all && i === winnerIdx) return;
+        const row = document.createElement('div');
+        row.className = 'pip-row';
+        row.innerHTML = `<div class="pip-name tc${i}">${esc(p.name)}</div>
+            <input type="number" id="pip-${i}" min="0" max="500" value="0">`;
+        c.appendChild(row);
+    });
+}
+
+function submitClassic() {
+    if (classicWinner === null) { toast('Select who won the round'); return; }
+
+    let winnerIdx, score, desc;
+
+    if (classicWinner === 'block') {
+        const pips = G.players.map((_, i) => {
+            const el = document.getElementById('pip-'+i);
+            return el ? parseInt(el.value)||0 : 0;
+        });
+        const minVal = Math.min(...pips);
+        winnerIdx = pips.indexOf(minVal);
+        score = pips.reduce((s,v)=>s+v,0) - minVal;
+        desc = `${G.players[winnerIdx].name} wins blocked round (+${score})`;
+    } else {
+        winnerIdx = classicWinner;
+        score = G.players.reduce((s, _, i) => {
+            if (i === winnerIdx) return s;
+            const el = document.getElementById('pip-'+i);
+            return s + (el ? parseInt(el.value)||0 : 0);
+        }, 0);
+        desc = `${G.players[winnerIdx].name} wins round (+${score})`;
+    }
+
+    recordScore(winnerIdx, score, desc);
+    closeModal('modal-classic');
+    renderGameScreen();
+    checkWinner();
+}
+
+// ── Fives modal ────────────────────────────────────────
+
+let fivesPlayer = null;
+
+function openFivesModal() {
+    fivesPlayer = null;
+    document.getElementById('fives-custom').value = '';
+    const c = document.getElementById('fives-chips');
+    c.innerHTML = '';
+    G.players.forEach((p, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'chip';
+        btn.textContent = p.name;
+        btn.onclick = () => {
+            fivesPlayer = i;
+            c.querySelectorAll('.chip').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+        };
+        c.appendChild(btn);
+    });
+    openModal('modal-fives');
+}
+
+function fivesAdd(pts) {
+    if (fivesPlayer === null) { toast('Select a player first'); return; }
+    recordScore(fivesPlayer, pts, `${G.players[fivesPlayer].name} scores +${pts}`);
+    renderGameScreen();
+    if (checkWinner()) closeModal('modal-fives');
+}
+
+function fivesAddCustom() {
+    const v = parseInt(document.getElementById('fives-custom').value);
+    if (!v || v <= 0) { toast('Enter a valid score'); return; }
+    document.getElementById('fives-custom').value = '';
+    fivesAdd(v);
+}
+
+// ── Score / undo ───────────────────────────────────────
+
+function recordScore(idx, pts, desc) {
+    const snapshot = G.players.map(p => ({...p}));
+    G.round++;
+    G.players[idx].score += pts;
+    G.history.push({ round: G.round, desc, snapshot });
+}
+
+function undoLast() {
+    if (!G.history.length) { toast('Nothing to undo'); return; }
+    const last = G.history.pop();
+    G.players = last.snapshot.map(p => ({...p}));
+    G.round = Math.max(0, G.round - 1);
+    renderGameScreen();
+}
+
+// ── Winner ─────────────────────────────────────────────
+
+function checkWinner() {
+    const w = G.players.find(p => p.score >= G.target);
+    if (w) { showWinner(w); return true; }
+    return false;
+}
+
+function showWinner(w) {
+    document.getElementById('winner-name').textContent = w.name;
+    const sorted = [...G.players].sort((a,b) => b.score - a.score);
+    const fc = document.getElementById('final-scores');
+    fc.innerHTML = '';
+    sorted.forEach(p => {
+        const row = document.createElement('div');
+        row.className = 'final-row' + (p.name === w.name ? ' top' : '');
+        row.innerHTML = `<span class="fr-name">${esc(p.name)}</span><span class="fr-pts">${p.score} pts</span>`;
+        fc.appendChild(row);
+    });
+    show('winner');
+}
+
+function playAgain() {
+    G.players.forEach(p => p.score = 0);
+    G.history = [];
+    G.round = 0;
+    renderGameScreen();
+    show('game');
+}
+
+function goSetup() { show('setup'); }
+
+function confirmNewSetup() {
+    if (G.history.length > 0 && !confirm('Start a new setup? Current game will be lost.')) return;
+    show('setup');
+}
+
+// ── Modals / nav ───────────────────────────────────────
+
+function openScoreModal() {
+    G.mode === 'classic' ? openClassicModal() : openFivesModal();
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function overlayClose(e, id) {
+    if (e.target === document.getElementById(id)) closeModal(id);
+}
+
+function show(name) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-'+name).classList.add('active');
+}
+
+function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.display = 'block';
+    clearTimeout(t._tid);
+    t._tid = setTimeout(() => { t.style.display = 'none'; }, 2200);
+}
+
+function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Init ───────────────────────────────────────────────
+renderNameInputs();
+renderTargets();
+</script>
+</body>
+</html>
