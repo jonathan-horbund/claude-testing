@@ -161,7 +161,7 @@
             padding: 14px 4px; background: #fff; border: 2px solid #e8e0d0;
             color: #555; font-size: 15px; font-weight: 700; border-radius: 10px; flex: none;
         }
-        .score-quick .btn:active { border-color: #f5c431; background: #fff9e0; color: #1a1a1a; }
+        .score-quick .btn:active, .score-quick .btn.selected { border-color: #f5c431; background: #fff9e0; color: #1a1a1a; }
 
         .custom-row { display: flex; gap: 10px; align-items: center; margin-bottom: 18px; }
         .custom-row input { flex: 1; }
@@ -308,20 +308,21 @@
         <div class="modal-title">Add Points</div>
         <p class="section-label">Player</p>
         <div class="player-chips" id="fives-chips"></div>
-        <p class="section-label">Quick Score</p>
-        <div class="score-quick">
-            <button class="btn" onclick="fivesAdd(5)">5</button>
-            <button class="btn" onclick="fivesAdd(10)">10</button>
-            <button class="btn" onclick="fivesAdd(15)">15</button>
-            <button class="btn" onclick="fivesAdd(20)">20</button>
-            <button class="btn" onclick="fivesAdd(25)">25</button>
+        <p class="section-label">Score</p>
+        <div class="score-quick" id="fives-quick">
+            <button class="btn" onclick="selectFivesScore(5)">5</button>
+            <button class="btn" onclick="selectFivesScore(10)">10</button>
+            <button class="btn" onclick="selectFivesScore(15)">15</button>
+            <button class="btn" onclick="selectFivesScore(20)">20</button>
+            <button class="btn" onclick="selectFivesScore(25)">25</button>
         </div>
-        <p class="section-label">Custom</p>
         <div class="custom-row">
-            <input type="number" id="fives-custom" min="0" step="1" placeholder="0">
-            <button class="btn btn-green" onclick="fivesAddCustom()">Add</button>
+            <input type="number" id="fives-custom" min="0" step="1" placeholder="Custom amount" oninput="clearQuickSelection()">
+            </div>
+        <div class="modal-btns">
+            <button class="btn btn-ghost" onclick="closeModal('modal-fives')">Done</button>
+            <button class="btn btn-green" style="flex:2" onclick="submitFives()">Add Points</button>
         </div>
-        <button class="btn btn-ghost" style="width:100%" onclick="closeModal('modal-fives')">Done</button>
     </div>
 </div>
 
@@ -536,10 +537,13 @@ function submitClassic() {
 // ── Fives modal ────────────────────────────────────────
 
 let fivesPlayer = null;
+let fivesScore = null;
 
 function openFivesModal() {
     fivesPlayer = null;
+    fivesScore = null;
     document.getElementById('fives-custom').value = '';
+    clearQuickSelection();
     const c = document.getElementById('fives-chips');
     c.innerHTML = '';
     G.players.forEach((p, i) => {
@@ -556,18 +560,34 @@ function openFivesModal() {
     openModal('modal-fives');
 }
 
-function fivesAdd(pts) {
-    if (fivesPlayer === null) { toast('Select a player first'); return; }
-    recordScore(fivesPlayer, pts, `${G.players[fivesPlayer].name} scores +${pts}`);
-    renderGameScreen();
-    if (checkWinner()) closeModal('modal-fives');
+function selectFivesScore(pts) {
+    fivesScore = pts;
+    document.getElementById('fives-custom').value = '';
+    document.querySelectorAll('#fives-quick .btn').forEach((b, idx) => {
+        b.classList.toggle('selected', [5,10,15,20,25][idx] === pts);
+    });
 }
 
-function fivesAddCustom() {
-    const v = parseInt(document.getElementById('fives-custom').value);
-    if (!v || v <= 0) { toast('Enter a valid score'); return; }
+function clearQuickSelection() {
+    fivesScore = null;
+    document.querySelectorAll('#fives-quick .btn').forEach(b => b.classList.remove('selected'));
+}
+
+function submitFives() {
+    if (fivesPlayer === null) { toast('Select a player first'); return; }
+    const custom = parseInt(document.getElementById('fives-custom').value);
+    const pts = custom > 0 ? custom : fivesScore;
+    if (!pts || pts <= 0) { toast('Select or enter a score'); return; }
+
+    recordScore(fivesPlayer, pts, `${G.players[fivesPlayer].name} scores +${pts}`);
+    renderGameScreen();
+
+    // Reset score selection for next entry, keep player selected
+    fivesScore = null;
     document.getElementById('fives-custom').value = '';
-    fivesAdd(v);
+    clearQuickSelection();
+
+    if (checkWinner()) closeModal('modal-fives');
 }
 
 // ── Score / undo ───────────────────────────────────────
